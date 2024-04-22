@@ -1,0 +1,7 @@
+/.env
+/node_modules
+
+DB_NAME=chatapp
+DB_USER=root
+DB_PASSWORD=Amit1234
+HOST_NAME=localhost

@@ -28,10 +28,10 @@ document.addEventListener('DOMContentLoaded',()=>{
         const name = document.getElementById('name').value;
         const email= document.getElementById('email').value;
         const password = document.getElementById('password').value;
-        
-        console.log("name,email,password:", { name, email, password });
+        const mobileno=document.getElementById('mobilenum').value;
+        console.log("name,email,password:", { name, email, password ,mobileno});
          try {
-            const response = await axios.post('/users/signup', { name, email, password });
+            const response = await axios.post('/users/signup', { name, email, password,mobileno });
             console.log(response.data);
             alert('Sign Up Successfull!');
             clearFields();
