@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         }
     });
     document.getElementById("btn_Login").addEventListener("click", function() {
-        window.location.href = "./login.html";
+        window.location.href = "/Login/index.html";
     });
     document.getElementById('signup-form').addEventListener('submit', async (event) => {
         event.preventDefault();
@@ -29,8 +29,14 @@ document.addEventListener('DOMContentLoaded',()=>{
         const email= document.getElementById('email').value;
         const password = document.getElementById('password').value;
         const mobileno=document.getElementById('mobilenum').value;
-        console.log("name,email,password:", { name, email, password ,mobileno});
-         try {
+        console.log("name,email,password,mobileno:", { name, email, password ,mobileno});
+         
+        if (!name || !email || !password || !mobileno) {
+            alert('Please fill out all fields');
+            return;
+        }
+        
+        try {
             const response = await axios.post('/users/signup', { name, email, password,mobileno });
             console.log(response.data);
             alert('Sign Up Successfull!');

@@ -2,6 +2,7 @@ const express=require('express');
 const app=express();
 require('dotenv').config();
 
+const sequelize=require('./util/db');
 const path=require('path');
 const cors=require('cors');
 const fs=require('fs');
@@ -15,9 +16,9 @@ app.use(express.static('./public'));
 
 
 app.use(express.json());
-app.use('/admin',adminRoutes);
+app.use('/users',adminRoutes);
 
-const sequelize=require('./util/db');
+
 sequelize.sync().then(
     ()=>{
         app.listen(3000,()=>{

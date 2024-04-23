@@ -23,9 +23,10 @@ const User=sequelize.define('users',{
         type:Sequelize.STRING,
     },
    mobileno:{
-    type:Sequelize.NUMBER,
-    allowNull:false,
-    unique:true
+    type:Sequelize.INTEGER,
+    allowNull:true,
+    unique:true,
+    defaultValue: null
    }
     
     
