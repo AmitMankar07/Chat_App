@@ -68,7 +68,7 @@ document.getElementById('password').addEventListener('input', () => {
             if (response.status === 200) {
                 alert('Login Successfull!');
             clearFields();
-              window.location.href='main.html';
+              window.location.href='/Groupchat/index.html';
             }
         
           // Clear the email and password fields
