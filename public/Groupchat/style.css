@@ -16,7 +16,7 @@ body {
 .chat-header {
     background-color: #3f51b5;
     color: #fff;
-    padding: 10px;
+    padding: 20px; /* Increase padding to create more space */
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
 }
@@ -53,9 +53,13 @@ body {
     max-width: 70%;
 }
 
+.center-message {
+    text-align: center;
+}
+
 .chat-input {
     display: flex;
-    padding: 10px;
+    padding: 20px;
 }
 
 .chat-input input[type="text"] {

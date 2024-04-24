@@ -2,13 +2,20 @@ const express=require('express');
 const app=express();
 require('dotenv').config();
 
+const bodyParser = require("body-parser");
 const sequelize=require('./util/db');
 const path=require('path');
 const cors=require('cors');
 const fs=require('fs');
+
+//Routes
 const adminRoutes=require('./routes/adminRoutes');
+const chatRoutes=require('./routes/chatRoutes');
 
 // const session = require('express-session');
+//Models
+const User = require("./models/user");
+const Chat = require("./models/chats");
 
 app.use(cors());
 app.use(express.static('./public'));
@@ -17,7 +24,10 @@ app.use(express.static('./public'));
 
 app.use(express.json());
 app.use('/users',adminRoutes);
+app.use('/chats',chatRoutes);
 
+User.hasMany(Chat, { onDelete: "CASCADE", hooks: true });
+Chat.belongsTo(User);
 
 sequelize.sync().then(
     ()=>{
