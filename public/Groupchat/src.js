@@ -1,14 +1,31 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded',async () => {
     let chatMessages = document.getElementById('chat-messages'); // Initialize chatMessages here
 
-    const token = localStorage.getItem('token');
-    if (token) {
-        const { name } = JSON.parse(atob(token.split('.')[1])); // Decoding JWT token
-        addMessage(`${name} has joined the chat`, false);
-    } else {
-        console.error('Token not found in localStorage');
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.error('Token not found in localStorage');
+            return;
+        }
+        
+        const response = await axios.get('/chats/getMessages', {
+            headers: {
+                'Authorization': `${token}`
+            }
+        });
+
+        if (response.status === 200) {
+            const messages = response.data.messages;
+            messages.forEach(message => {
+                addMessage(`${message.name}: ${message.message}`, message.isCurrentUser);
+            });
+        } else {
+            console.error('Failed to fetch messages');
+        }
+    } catch (error) {
+        console.error('Error fetching messages:', error.response ? error.response.data : error.message);
     }
-    
+
     const messageInput = document.getElementById('message-input');
     const sendButton = document.getElementById('send-button');
 

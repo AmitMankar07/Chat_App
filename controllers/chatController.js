@@ -23,3 +23,16 @@ exports.sendMessage = async (req, res, next) => {
     }
   };
   
+  
+exports.getMessages = async (req, res, next) => {
+  try {
+      // Fetch messages from the database
+      const messages = await Chat.findAll();
+
+      // Send the messages as a response
+      res.status(200).json({ messages });
+  } catch (error) {
+      console.error("Error fetching messages:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+  }
+};
