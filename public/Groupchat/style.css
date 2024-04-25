@@ -16,9 +16,27 @@ body {
 .chat-header {
     background-color: #3f51b5;
     color: #fff;
-    padding: 20px; /* Increase padding to create more space */
+    padding: 10px;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
+    display: flex;
+    justify-content: space-between; /* Align items horizontally */
+    align-items: center; /* Align items vertically */
+}
+
+
+.chat-header button {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 20px;
+    background-color: black; /* Red color for sign-out button */
+    color: #fff;
+    cursor: pointer;
+    outline: none;
+}
+
+.chat-header button:hover {
+    background-color: #725a5a; /* Darker shade of red on hover */
 }
 
 .chat-header h1 {
