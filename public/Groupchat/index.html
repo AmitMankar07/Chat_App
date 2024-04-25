@@ -12,6 +12,8 @@
     <div class="chat-container">
         <div class="chat-header">
             <h1>Chat App</h1>
+            <button id="create-group-button">Create Group</button>
+      
             <button id="sign-out-button">Sign Out</button>
             
         </div>
@@ -23,7 +25,28 @@
             <button id="send-button">Send</button>
         </div>
     </div>
-
+    <div class="sidebar">
+        <h2>My Groups</h2>
+        <ul id="group-list">
+            <!-- Group names will be dynamically added here -->
+        </ul>
+    </div>
+    
+    <div id="create-group-modal" class="modal" hidden>
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Create Group</h2>
+            <form id="create-group-form">
+                <label for="group-name">Group Name:</label>
+                <input type="text" id="group-name" name="group-name" required>
+                <label for="invite-users">Invite Users:</label>
+                <input type="text" id="invite-users" name="invite-users" placeholder="Search or enter email/username" required>
+                <!-- Display search results or selected users here -->
+                <button type="submit">Create Group</button>
+            </form>
+        </div>
+    </div>
     <script src="src.js"></script>
+    <script src="group.js"></script>
 </body>
 </html>
