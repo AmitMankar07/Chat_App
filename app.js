@@ -16,6 +16,7 @@ const chatRoutes=require('./routes/chatRoutes');
 //Models
 const User = require("./models/user");
 const Chat = require("./models/chats");
+const { FORCE } = require('sequelize/lib/index-hints');
 
 app.use(cors());
 app.use(express.static('./public'));

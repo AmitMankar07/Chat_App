@@ -1,18 +1,33 @@
-document.addEventListener('DOMContentLoaded',async () => {
-    
+document.addEventListener('DOMContentLoaded', async () => {
     let chatMessages = document.getElementById('chat-messages'); // Initialize chatMessages here
-    let latestMessageId = null;
+    let latestMessageId = -1; // Set initial value to -1
+
+    // Function to store recent messages in local storage
+    function storeMessagesInLocalStorage(messages) {
+        const storedMessages = JSON.parse(localStorage.getItem('recentMessages')) || [];
+        const updatedMessages = [...storedMessages, ...messages];
+        const recentMessages = updatedMessages.slice(-10); // Limit to latest 10 messages
+        localStorage.setItem('recentMessages', JSON.stringify(recentMessages));
+    }
+
+    // Function to retrieve recent messages from local storage
+    function retrieveMessagesFromLocalStorage() {
+        const recentMessages = JSON.parse(localStorage.getItem('recentMessages')) || [];
+        recentMessages.forEach(message => {
+            addMessage(`${message.name}: ${message.message}`, message.isCurrentUser);
+        });
+    }
 
     async function fetchMessages() {
-    try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            console.error('Token not found in localStorage');
-            return;
-        }
-        
-        let url = '/chats/getMessages';
-            if (latestMessageId) {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                console.error('Token not found in localStorage');
+                return;
+            }
+            
+            let url = '/chats/getMessages';
+            if (latestMessageId !== -1) { // Only add latestMessageId to URL if it's not -1
                 url += `?latestMessageId=${latestMessageId}`;
             }
 
@@ -22,23 +37,24 @@ document.addEventListener('DOMContentLoaded',async () => {
                 }
             });
 
-        if (response.status === 200) {
-            const messages = response.data.messages;
-            messages.forEach(message => {
-                addMessage(`${message.name}: ${message.message}`, message.isCurrentUser);
-            });
-            if (messages.length > 0) {
-                latestMessageId = messages[messages.length - 1].id;
+            if (response.status === 200) {
+                const messages = response.data.messages;
+                if (messages.length > 0) {
+                    const newMessages = messages.filter(message => message.id > latestMessageId); 
+                    latestMessageId = messages[messages.length - 1].id;
+                    storeMessagesInLocalStorage(messages); // Store new messages in local storage
+                    // messages.forEach(message => {
+                        newMessages.forEach(message => {
+                        addMessage(`${message.name}: ${message.message}`, message.isCurrentUser);
+                    });
+                }
+            } else {
+                console.error('Failed to fetch messages');
             }
-        } else {
-            console.error('Failed to fetch messages');
+        } catch (error) {
+            console.error('Error fetching messages:', error.response ? error.response.data : error.message);
         }
-    } catch (error) {
-        console.error('Error fetching messages:', error.response ? error.response.data : error.message);
     }
-    }
-    const messageInput = document.getElementById('message-input');
-    const sendButton = document.getElementById('send-button');
 
     // Function to add a message to the chat interface
     function addMessage(message, isUser) {
@@ -63,8 +79,9 @@ document.addEventListener('DOMContentLoaded',async () => {
     }
 
     // Function to handle form submission (sending messages)
-   async function handleSubmit(event) {
+    async function handleSubmit(event) {
         event.preventDefault();
+        const messageInput = document.getElementById('message-input'); // Define messageInput here
         const message = messageInput.value.trim();
 
         if (message !== '') {
@@ -89,7 +106,11 @@ document.addEventListener('DOMContentLoaded',async () => {
     }
 
     // Event listener for form submission
+    const sendButton = document.getElementById('send-button'); // Define sendButton here
     sendButton.addEventListener('click', handleSubmit);
+    
+    // Retrieve recent messages from local storage on page load
+    retrieveMessagesFromLocalStorage();
     
     await fetchMessages();
     
