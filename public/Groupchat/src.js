@@ -83,11 +83,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         event.preventDefault();
         const messageInput = document.getElementById('message-input'); // Define messageInput here
         const message = messageInput.value.trim();
+        // const groupNameElement = document.querySelector('.selected-group');
+        // const groupName = groupNameElement ? groupNameElement.textContent : '';
+     
+  const selectedGroup = localStorage.getItem('selectedGroup');
 
-        if (message !== '') {
+
+        console.log("groupname in handlesubmit :",selectedGroup);
+
+        if (message !== '' && selectedGroup) {
             try {
                 const token = localStorage.getItem('token');
-                const response = await axios.post('/chats/sendMessage', { message }, {
+                const response = await axios.post('/chats/sendMessage', { message,groupName:selectedGroup }, {
                     headers: {
                         'Authorization': `${token}`
                     }
@@ -127,4 +134,141 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     signOutButton.addEventListener('click', handleSignOut);
 
+
+    const createGroupButton = document.getElementById('create-group-button');
+    const createGroupModal = document.getElementById('create-group-modal');
+    const closeButton = document.getElementsByClassName('close')[0];
+
+    createGroupButton.addEventListener('click', () => {
+        createGroupModal.style.display = 'block';
+    });
+
+    closeButton.addEventListener('click', () => {
+        createGroupModal.style.display = 'none';
+    });
+
+    window.addEventListener('click', (event) => {
+        if (event.target == createGroupModal) {
+            createGroupModal.style.display = 'none';
+        }
+    });
+
+    const createGroupForm = document.getElementById('create-group-form');
+    createGroupForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const groupName = document.getElementById('group-name').value;
+        console.log("groupname:",groupName);
+        const invitedUsers = document.getElementById('invite-users').value.split(',');
+        // Send API request to create group and invite users
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.post('/groups/createGroup', { groupName, members: invitedUsers }, {
+                headers: {
+                    'Authorization': `${token}`
+                }
+            });
+            if (response.status === 201) {
+                console.log('Group created successfully:', response.data);
+                // Close modal after creating group
+                createGroupModal.style.display = 'none';
+                // Fetch user's groups again after creating a new group
+                fetchUserGroups();
+            } else {
+                console.error('Failed to create group');
+            }
+        } catch (error) {
+            console.error('Error creating group:', error);
+        }
+    });
+
+    const groupList = document.getElementById('group-list');
+
+    // Function to fetch user's groups from the server
+    async function fetchUserGroups() {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                console.error('Token not found in localStorage');
+                return;
+            }
+
+            const response = await axios.get('/groups/getUserGroups', {
+                headers: {
+                    'Authorization': `${token}`
+                }
+            });
+
+            if (response.status === 200) {
+                const groups = response.data.groups;
+              console.log(groups)
+                // Clear existing group list
+                groupList.innerHTML = '';
+
+                // Populate the group list
+                groups.forEach(group => {
+                    console.log(group);
+                    if (group && group.name) { // Check if group and group.name are defined
+               
+                    const listItem = document.createElement('li');
+                    listItem.textContent = group.name;
+                    listItem.setAttribute('data-group-id', group.id); // Store group ID as a data attribute
+                    groupList.appendChild(listItem);
+                    } else {
+                        console.error('Invalid group object:', group);
+                    }
+                });
+            } else {
+                console.error('Failed to fetch user groups');
+            }
+        } catch (error) {
+            console.error('Error fetching user groups:', error.response ? error.response.data : error.message);
+        }
+    }
+
+    // Call fetchUserGroups function when the DOM is loaded
+    fetchUserGroups();
+
+    // Event listener for clicking on a group in the sidebar
+    document.getElementById('group-list').addEventListener('click', async(event) => {
+        if (event.target.tagName === 'LI') {
+            const groupName = event.target.textContent;
+    localStorage.setItem('selectedGroup', groupName);
+            const groupId = event.target.getAttribute('data-group-id');
+            // Implement switching to the selected group
+            console.log('Switching to group with ID:', groupId);
+            try {
+                // Send API request to fetch messages associated with the clicked group
+                const token = localStorage.getItem('token');
+                const response = await axios.get(`/chats/groups/${groupId}/messages`, {
+                    headers: {
+                        'Authorization': `${token}`
+                    }
+                });
+    console.log("response of getgrpmsg",response);
+                if (response.status === 200) {
+                    const messages = response.data.messages;
+                    // Update the chat box with the fetched messages
+                    displayMessages(response.data.messages);
+                } else {
+                    console.error('Failed to fetch messages');
+                }
+            } catch (error) {
+                console.error('Error fetching messages:', error);
+            }
+        }
+    });
+    function displayMessages(messages) {
+        const chatMessages = document.getElementById('chat-messages');
+        // Clear existing messages
+        chatMessages.innerHTML = '';
+    
+        // Populate the chat box with the fetched messages
+        messages.forEach(message => {
+            const messageElement = document.createElement('div');
+            // messageElement.textContent = message.text; // Assuming each message has a 'text' property
+            messageElement.textContent = `${message.name}: ${message.message}`;
+    
+            chatMessages.appendChild(messageElement);
+        });
+    }
 });
